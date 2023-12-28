@@ -1,0 +1,6 @@
+[submodule "submodules/pwp-lib2"]
+	path = submodules/pwp-lib2
+	url = https://github.com/benempson/pwp-lib2.git
+[submodule "code/submodules/pwp-lib2"]
+	path = code/submodules/pwp-lib2
+	url = https://github.com/benempson/pwp-lib2.git

@@ -1,0 +1,301 @@
+{
+  "TCCultures": [
+    {
+      "TwoLetterCultureCode": "en",
+      "FullCultureCode": "en-GB",
+      "TwoLetterFlagCode": "GB"
+    },
+    {
+      "TwoLetterCultureCode": "es",
+      "FullCultureCode": "es-ES",
+      "TwoLetterFlagCode": "ES"
+    }
+  ],
+  "TCTranslationAreas": [
+    {
+      "Name": "Nav",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "Group.Settings",
+          "Value": "Settings"
+        },
+        {
+          "Culture": "es",
+          "Key": "Group.Settings",
+          "Value": "Ajustes"
+        },
+        {
+          "Culture": "en",
+          "Key": "Menu.Settings_Language",
+          "Value": "Language"
+        },
+        {
+          "Culture": "es",
+          "Key": "Menu.Settings_Language",
+          "Value": "Idioma"
+        },
+        {
+          "Culture": "en",
+          "Key": "Group.Utils",
+          "Value": "Utils"
+        },
+        {
+          "Culture": "es",
+          "Key": "Group.Utils",
+          "Value": "Herramientas"
+        },
+        {
+          "Culture": "en",
+          "Key": "Menu.Utils_Logs",
+          "Value": "Logs"
+        },
+        {
+          "Culture": "es",
+          "Key": "Menu.Utils_Logs",
+          "Value": "Bitacoras"
+        },
+        {
+          "Culture": "en",
+          "Key": "Menu.Utils_Counter",
+          "Value": "Counter"
+        },
+        {
+          "Culture": "es",
+          "Key": "Menu.Utils_Counter",
+          "Value": "Contador"
+        },
+        {
+          "Culture": "en",
+          "Key": "Menu.Utils_Weather",
+          "Value": "Weather"
+        },
+        {
+          "Culture": "es",
+          "Key": "Menu.Utils_Weather",
+          "Value": "Tiempo"
+        }
+      ]
+    },
+    {
+      "Name": "Index",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "HelloWorld",
+          "Value": "Hello, World!"
+        },
+        {
+          "Culture": "es",
+          "Key": "HelloWorld",
+          "Value": "Hola, Mundo!"
+        },
+        {
+          "Culture": "en",
+          "Key": "WelcomeMessage",
+          "Value": "Welcome to your new app."
+        },
+        {
+          "Culture": "es",
+          "Key": "WelcomeMessage",
+          "Value": "Bienvenido a tu nuevo app."
+        }
+      ]
+    },
+    {
+      "Name": "Settings_Language",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "PageTitle",
+          "Value": "Languages"
+        },
+        {
+          "Culture": "es",
+          "Key": "PageTitle",
+          "Value": "Idiomas"
+        },
+        {
+          "Culture": "en",
+          "Key": "SelectLanguage",
+          "Value": "Select your language"
+        },
+        {
+          "Culture": "es",
+          "Key": "SelectLanguage",
+          "Value": "Eligir tu idioma"
+        },
+        {
+          "Culture": "en",
+          "Key": "en.Name",
+          "Value": "English"
+        },
+        {
+          "Culture": "es",
+          "Key": "en.Name",
+          "Value": "Inglés"
+        },
+        {
+          "Culture": "en",
+          "Key": "es.Name",
+          "Value": "Spanish"
+        },
+        {
+          "Culture": "es",
+          "Key": "es.Name",
+          "Value": "Español"
+        }
+      ]
+    },
+    {
+      "Name": "Utils_Logs",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "PageTitle",
+          "Value": "Logs"
+        },
+        {
+          "Culture": "es",
+          "Key": "PageTitle",
+          "Value": "Bitacoras"
+        },
+        {
+          "Culture": "en",
+          "Key": "SettingsTab.Name",
+          "Value": "Settings"
+        },
+        {
+          "Culture": "es",
+          "Key": "SettingsTab.Name",
+          "Value": "Ajustes"
+        },
+        {
+          "Culture": "en",
+          "Key": "SettingsTab.LogLevel",
+          "Value": "Log level"
+        },
+        {
+          "Culture": "es",
+          "Key": "SettingsTab.LogLevel",
+          "Value": "Nivel de bitacora"
+        },
+        {
+          "Culture": "en",
+          "Key": "SettingsTab.LogLevelChangeWarning",
+          "Value": "WARNING! Do not change these settings unless directed to by the Developer. They can generate a lot of information which will take up more storage space on your device."
+        },
+        {
+          "Culture": "es",
+          "Key": "SettingsTab.LogLevelChangeWarning",
+          "Value": "ADVERTENCIA! No cambies estes ajustes si no has sido dirigido a hacerlo por el desarollador. Pueden generar mucha información que ocupará màs espacio en tu dispositivo."
+        },
+        {
+          "Culture": "en",
+          "Key": "SettingsTab.InternalLog",
+          "Value": "Internal Log"
+        },
+        {
+          "Culture": "es",
+          "Key": "SettingsTab.InternalLog",
+          "Value": "Internal Log"
+        },
+        {
+          "Culture": "en",
+          "Key": "MemoryTab.Name",
+          "Value": "Memory Logger"
+        },
+        {
+          "Culture": "es",
+          "Key": "MemoryTab.Name",
+          "Value": "Registradora de memoria"
+        },
+        {
+          "Culture": "en",
+          "Key": "CopyLog",
+          "Value": "Copy Log"
+        },
+        {
+          "Culture": "es",
+          "Key": "CopyLog",
+          "Value": "Copia Bitacora"
+        },
+        {
+          "Culture": "en",
+          "Key": "ContentCopied.Title",
+          "Value": "Copied!"
+        },
+        {
+          "Culture": "es",
+          "Key": "ContentCopied.Title",
+          "Value": "Copiado!"
+        },
+        {
+          "Culture": "en",
+          "Key": "ContentCopied.Body",
+          "Value": "The log has been copied to the clipboard."
+        },
+        {
+          "Culture": "es",
+          "Key": "ContentCopied.Body",
+          "Value": "La bitacora ha sido copiado al portapapeles."
+        }
+      ]
+    },
+    {
+      "Name": "Utils_Counter",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "PageTitle",
+          "Value": "Counter"
+        },
+        {
+          "Culture": "es",
+          "Key": "PageTitle",
+          "Value": "Contador"
+        }
+      ]
+    },
+    {
+      "Name": "Utils_Weather",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "PageTitle",
+          "Value": "Weather"
+        },
+        {
+          "Culture": "es",
+          "Key": "PageTitle",
+          "Value": "Tiempo"
+        },
+        {
+          "Culture": "en",
+          "Key": "Description",
+          "Value": "This component demonstrates showing data."
+        },
+        {
+          "Culture": "es",
+          "Key": "Description",
+          "Value": "Este componente demuestra como presentar datos."
+        }
+      ]
+    },
+    {
+      "Name": "Dialogs",
+      "TCTranslations": [
+        {
+          "Culture": "en",
+          "Key": "All.OK",
+          "Value": "OK"
+        },
+        {
+          "Culture": "es",
+          "Key": "All.OK",
+          "Value": "OK"
+        }
+      ]
+    }
+  ]
+}
