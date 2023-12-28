@@ -56,10 +56,10 @@ public class DbInitializer
         }
 
         string hashCode = configText!.ToSHA1Hash();
-        DataState? ds = _dataContext.DataStates.SingleOrDefault(s => s.Type!.Equals(PWPConstants.DataStateTypes.TRANSLATIONS));
+        DataState? ds = _dataContext.DataStates.SingleOrDefault(s => s.Type!.Equals(AppConstants.DataStateTypes.TRANSLATIONS));
         if (ds == null)
         {
-            ds = new DataState { Type = PWPConstants.DataStateTypes.TRANSLATIONS, StateHash = "" };
+            ds = new DataState { Type = AppConstants.DataStateTypes.TRANSLATIONS, StateHash = "" };
             _dataContext.DataStates.Add(ds);
         }
 

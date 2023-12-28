@@ -1,6 +1,6 @@
 ﻿namespace PWP.Maui.Domain;
 
-public class PWPConstants
+public class AppConstants
 {
     public struct CultureRefs
     {

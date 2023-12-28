@@ -18,11 +18,11 @@ public class TranslationService : ITranslationService
     private bool _cultureIsSupported = true;
     private ILogger<TranslationService> _logger;
     private IPlatformPreferences _platformPreferences;
-    private PWPRuntimeValues _runtimeValues;
+    private RuntimeValues _runtimeValues;
     private List<Translation> _translations = new List<Translation>();
     private List<string> _supportedCultures = new List<string>();
 
-    public TranslationService(IPWPMauiDataContext dataContext, ILogger<TranslationService> logger, IPlatformPreferences platformPreferences, PWPRuntimeValues runtimeValues)
+    public TranslationService(IPWPMauiDataContext dataContext, ILogger<TranslationService> logger, IPlatformPreferences platformPreferences, RuntimeValues runtimeValues)
     {
         _dataContext = dataContext;
         _logger = logger;
@@ -105,7 +105,7 @@ public class TranslationService : ITranslationService
             _translations.Clear();
 
             Culture? culture = null;
-            string currentCulture = _platformPreferences.Get(PWPConstants.PreferenceKeys.CULTURE, PWPConstants.PreferenceKeys.CULTURE_DEFAULT);
+            string currentCulture = _platformPreferences.Get(AppConstants.PreferenceKeys.CULTURE, AppConstants.PreferenceKeys.CULTURE_DEFAULT);
 
             if (!_supportedCultures.Contains(currentCulture))
             {

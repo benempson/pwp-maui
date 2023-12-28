@@ -2,17 +2,28 @@
 
 namespace PWP.Maui.Domain;
 
-public class PWPRuntimeValues
+public class RuntimeValues
 {
+    private string _dbFilename = "PWPMaui_Db.db3";
+
+    /// <summary>
+    /// Whether or not the RuntimeValue have been configured
+    /// </summary>
+    public bool Configured { get; set; } = false;
+
     /// <summary>
     /// The Sqlite Db filename
     /// </summary>
-    public readonly string DbFilename = "PWP.Maui_Db.db3";
+    public string DbFilename
+    {
+        get { return _dbFilename; }
+        set { SetDbPaths(value); }
+    }
 
     /// <summary>
     /// The Sqlite connection string
     /// </summary>
-    public string DbConnectionString { get; private set; }
+    public string? DbConnectionString { get; private set; }
 
     /// <summary>
     /// The folder containing the Sqlite Db files
@@ -22,7 +33,7 @@ public class PWPRuntimeValues
     /// <summary>
     /// The full path to the Sqlite database
     /// </summary>
-    public string DbFullPath { get; private set; }
+    public string? DbFullPath { get; private set; }
 
     /// <summary>
     /// Whether or not the Db has been initialized
@@ -68,16 +79,22 @@ public class PWPRuntimeValues
     /// </summary>
     public string NLogInternalLogFullpath { get; private set; }
     
-    public PWPRuntimeValues(string localAppDataFolder)
+    public RuntimeValues(string localAppDataFolder)
     {
         LocalAppDataFolder = localAppDataFolder;
 
         DbFolder = localAppDataFolder;
-        DbFullPath = Path.Combine(localAppDataFolder, DbFilename);
-        DbConnectionString = $"Data Source={DbFullPath}";
+        SetDbPaths(_dbFilename);
         
         LogFolder = Path.Combine(LocalAppDataFolder, "Logs");
         LogFullpath = Path.Combine(LogFolder, LogFilename);
         NLogInternalLogFullpath = Path.Combine(LogFolder, NLogInternalLogFilename);
+    }
+
+    private void SetDbPaths(string dbFilename)
+    {
+        _dbFilename = dbFilename;
+        DbFullPath = Path.Combine(LocalAppDataFolder!, DbFilename);
+        DbConnectionString = $"Data Source={DbFullPath}";
     }
 }

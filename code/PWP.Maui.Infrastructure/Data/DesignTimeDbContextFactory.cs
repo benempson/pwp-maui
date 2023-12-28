@@ -9,7 +9,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<PWPMauiDat
     public PWPMauiDataContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<PWPMauiDataContext>();
-        optionsBuilder.UseSqlite($"Data Source={new PWPRuntimeValues(Environment.SpecialFolder.LocalApplicationData.ToString()).DbFilename}");
+        optionsBuilder.UseSqlite($"Data Source={new RuntimeValues(Environment.SpecialFolder.LocalApplicationData.ToString()).DbFilename}");
         return new PWPMauiDataContext(optionsBuilder.Options);
     }
 }

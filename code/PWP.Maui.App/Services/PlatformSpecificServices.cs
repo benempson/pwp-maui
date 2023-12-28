@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.LifecycleEvents;
 using NLog;
 using NLog.Extensions.Logging;
 using NLog.Filters;
@@ -18,13 +19,16 @@ namespace PWP.Maui.App.Services;
 public class PlatformSpecificServices : IPlatformSpecificServices
 {
     private IPWPMauiDataContext _dataContext;
+    private int _dbInitializationAttempts = 0;
+    private Exception? _dbInitializationError;
     private ILogger<PlatformSpecificServices> _logger;
     private ILoggerFactory _loggerFactory;
     private IPlatformPreferences _platformPreferences;
-    private PWPRuntimeValues _pwpRuntimeValues;
+    private RuntimeValues _runtimeValues;
+    private IServiceProvider _serviceProvider;
     private ITranslationService _translationService;
 
-    public PlatformSpecificServices(IPWPMauiDataContext dataContext, ILogger<PlatformSpecificServices> logger, ILoggerFactory loggerFactory, IPlatformPreferences platformPreferences, PWPRuntimeValues pwpRuntimeValues, ITranslationService translationServices)
+    public PlatformSpecificServices(IServiceProvider serviceProvider, IPWPMauiDataContext dataContext, ILogger<PlatformSpecificServices> logger, ILoggerFactory loggerFactory, IPlatformPreferences platformPreferences, RuntimeValues runtimeValues, ITranslationService translationServices)
     {
         _dataContext = dataContext;
         _logger = logger;
@@ -32,28 +36,36 @@ public class PlatformSpecificServices : IPlatformSpecificServices
 
         _loggerFactory = loggerFactory;
         _platformPreferences = platformPreferences;
-        _pwpRuntimeValues = pwpRuntimeValues;
+        _runtimeValues = runtimeValues;
+        _serviceProvider = serviceProvider;
         _translationService = translationServices;
     }
 
+    #region Properties
     public string AssemblyFileVersion { get { return ThisAssembly.AssemblyFileVersion; } }
 
     public string AssemblyInformationalVersion { get { return ThisAssembly.AssemblyInformationalVersion; } }
 
-    public void ChangeCulture(Type mainPageType, CultureInfo newCulture)
+    public Page? MainPage { get; set; }
+
+    #endregion
+
+    #region ChangeCulture
+    public void ChangeCulture(CultureInfo newCulture)
     {
-        _logger.LogFunctionStart();
+        _logger.LogFunctionStartWithArgs().Values(newCulture.Name);
+        Guard.ThrowIfNull(MainPage);
         
+        if (Application.Current != null)
+        {
+            //Microsoft.Extensions.Logging.ILogger mpLogger = _loggerFactory.CreateLogger(MainPage.GetType());
+            //Page? newMainPage = (Page?)Activator.CreateInstance(MainPage.GetType(), new object[] { mpLogger, _serviceProvider.GetRequiredService<IPlatformSpecificServices>() });
+            Application.Current.MainPage = MainPage;
+        }
+
         //https://stackoverflow.com/questions/76555754/how-to-reload-or-update-ui-in-net-maui-when-culture-has-been-changed
         //Any change to the Culture properties causes "Process terminated due to "Infinite recursion during resource lookup within System.Private.CoreLib.  This may be a bug in System.Private.CoreLib, or potentially in certain extensibility points such as assembly resolve events or CultureInfo names.  Resource name: IO_FileName_Name"
         //Errors in debug output prior to final crash: [monodroid-assembly] open_from_bundles: failed to load assembly en-GB/System.Private.CoreLib.resources.dll
-        if (Application.Current != null)
-        {
-            Microsoft.Extensions.Logging.ILogger mpLogger = _loggerFactory.CreateLogger(mainPageType);
-            ContentPage newMainPage = (Activator.CreateInstance(mainPageType, new object[] { _dataContext, mpLogger, _platformPreferences, _pwpRuntimeValues, _translationService }) as ContentPage)!;
-            Application.Current.MainPage = newMainPage!;
-        }
-
         //(Application.Current as App).MainPage.Dispatcher.Dispatch(() =>
         //{
         //    Thread.CurrentThread.CurrentCulture = newCulture;
@@ -64,15 +76,17 @@ public class PlatformSpecificServices : IPlatformSpecificServices
 
         _translationService.LoadTranslations();
     }
+    #endregion
 
+    #region ChangeLogLevel
     public void ChangeLogLevel(string newLevel)
     {
         _logger.LogFunctionStartWithArgs().Values(newLevel);
-        _platformPreferences.Set(PWPConstants.PreferenceKeys.LOG_LEVEL, newLevel);
+        _platformPreferences.Set(AppConstants.PreferenceKeys.LOG_LEVEL, newLevel);
         Microsoft.Extensions.Logging.LogLevel logLevel = Enum.Parse<Microsoft.Extensions.Logging.LogLevel>(newLevel);
         ChangeLogLevel(logLevel);
     }
-
+    
     public void ChangeLogLevel(Microsoft.Extensions.Logging.LogLevel newLevel)
     {
         NLog.LogLevel newNlogLevel = NLog.LogLevel.FromOrdinal((int)newLevel);
@@ -84,14 +98,58 @@ public class PlatformSpecificServices : IPlatformSpecificServices
         }
 
         LogManager.ReconfigExistingLoggers();
-        _pwpRuntimeValues.LogLevel = newLevel;
+        _runtimeValues.LogLevel = newLevel;
     }
+    #endregion
 
+    #region GetFileSystemAppDataDirectory
     public string GetFileSystemAppDataDirectory()
     {
         return FileSystem.Current.AppDataDirectory;
     }
+    #endregion
 
+    #region InitializeDb
+    public void InitializeDb()
+    {
+        _logger.LogFunctionStart();
+
+        _dbInitializationAttempts++;
+        if (_dbInitializationAttempts >= 3)
+        {
+            _logger.LogCritical(_dbInitializationError!, "Unable to Initialize Db");
+            throw new Exception("Unable to Initialize Db");
+        }
+
+        try
+        {
+            _dataContext.Database.Migrate();
+            _dataContext.Initialize();
+            _runtimeValues.DbInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "");
+
+            //if we get an error initializaing the Db, then simply delete it and start again
+            _dbInitializationError = ex;
+            _dataContext.Database.CloseConnection();
+            _dataContext.Database.EnsureDeleted();
+            InitializeDb();
+        }
+
+        _logger.LogFunctionEnd();
+    }
+    #endregion
+
+    #region InitializeTranslations
+    public void InitializeTranslations()
+    {
+        _translationService.LoadTranslations();
+    }
+    #endregion
+
+    #region IsDebug
     /// <summary>
     /// Whether or not the DEBUG PreProcessor directive is present
     /// </summary>
@@ -104,7 +162,9 @@ public class PlatformSpecificServices : IPlatformSpecificServices
       return false;
 #endif
     }
+    #endregion
 
+    #region IsMobile
     public bool IsMobile()
     {
 #if ANDROID
@@ -116,7 +176,9 @@ public class PlatformSpecificServices : IPlatformSpecificServices
         return false;
 #pragma warning restore CS0162 // Unreachable code detected
     }
+    #endregion
 
+    #region MemoryLoggerCreate
     /// <summary>
     /// Creates a Memory log target with the given log target name
     /// https://github.com/NLog/NLog/wiki/Memory-target
@@ -127,7 +189,7 @@ public class PlatformSpecificServices : IPlatformSpecificServices
     {
         string mtName = MemoryLoggerGetTargetName(targetType);
         MemoryTarget memoryTarget = new MemoryTarget(mtName);
-        memoryTarget.Layout = PWPConstants.Logging.DEFAULT_LOG_FORMAT;
+        memoryTarget.Layout = AppConstants.Logging.DEFAULT_LOG_FORMAT;
         NLog.Config.LoggingRule rule = new NLog.Config.LoggingRule(mtName);
         for (int x = (int)logLevel; x <= 5; x++)
             rule.EnableLoggingForLevel(NLog.LogLevel.FromOrdinal(x));
@@ -139,19 +201,25 @@ public class PlatformSpecificServices : IPlatformSpecificServices
         return _loggerFactory.CreateLogger(mtName);
         //return LogManager.GetLogger(targetType.Name);
     }
+    #endregion
 
+    #region MemoryLoggerGetLogs
     public IList<string> MemoryLoggerGetLogs(Type targetType)
     {
         MemoryTarget? mt = LogManager.Configuration.AllTargets.SingleOrDefault(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(MemoryLoggerGetTargetName(targetType))) as MemoryTarget;
         Guard.ThrowIfNull(mt);
         return mt.Logs;
     }
+    #endregion
 
+    #region MemoryLoggerGetTargetName
     public string MemoryLoggerGetTargetName(Type targetType)
     {
         return $"{targetType.FullName}:ML";
     }
+    #endregion
 
+    #region MemoryLoggerRemove
     public void MemoryLoggerRemove(Type targetType)
     {
         LogManager.Configuration.RemoveTarget(MemoryLoggerGetTargetName(targetType));
@@ -161,88 +229,17 @@ public class PlatformSpecificServices : IPlatformSpecificServices
 
         LogManager.ReconfigExistingLoggers();
     }
+    #endregion
 
-    public void SetupLogging(MauiAppBuilder builder)
-    {
-        builder.Logging.ClearProviders();
-        builder.Logging.AddNLog();
-
-        Guard.ThrowIfNull(_pwpRuntimeValues);
-
-        //https://github.com/NLog/NLog/wiki/Fluent-Configuration-API
-        //https://stackoverflow.com/questions/49337760/how-to-change-the-nlog-layout-at-run-time
-        LogManager.Setup().RegisterMauiLog()
-            .LoadConfiguration(builder =>
-            {
-                SimpleLayout layout = new SimpleLayout(PWPConstants.Logging.DEFAULT_LOG_FORMAT);
-                SimpleLayout filename = new SimpleLayout(_pwpRuntimeValues!.LogFullpath);
-
-                builder.ForLogger("Microsoft.AspNetCore.Routing.*").WriteToNil(NLog.LogLevel.Warn);
-                builder.ForLogger("Microsoft.AspNetCore.Components.*").WriteToNil(NLog.LogLevel.Warn);
-                builder.ForLogger("Microsoft.EntityFrameworkCore.Database.Connection").WriteToNil(NLog.LogLevel.Warn);
-                builder.ForLogger("Microsoft.EntityFrameworkCore.ChangeTracking").WriteToNil(NLog.LogLevel.Warn);
-                builder.ForLogger("MudBlazor.*").WriteToNil(NLog.LogLevel.Warn);
-                //builder.ForLogger().FilterMinLevel(NLog.LogLevel.FromString(_runtimeValues.LogLevel.ToString())).WriteToFile(filename, layout, Encoding.UTF8, NLog.Targets.LineEndingMode.Default, true, false, 262144, 3, 5);
-                //builder.ForLogger().FilterMinLevel(NLog.LogLevel.FromString(_runtimeValues.LogLevel.ToString())).WriteToMauiLog(layout);
-            })
-        .GetCurrentClassLogger();
-
-        FileTarget fileTarget = new FileTarget(PWPConstants.Logging.MAIN_LOG_NAME);
-        fileTarget.Layout = PWPConstants.Logging.DEFAULT_LOG_FORMAT;
-        fileTarget.FileName = _pwpRuntimeValues!.LogFullpath;
-        fileTarget.Encoding = Encoding.UTF8;
-        fileTarget.LineEnding = LineEndingMode.Default;
-        fileTarget.KeepFileOpen = true;
-        fileTarget.ConcurrentWrites = false;
-        fileTarget.ArchiveAboveSize = 262144;
-        fileTarget.MaxArchiveFiles = 3;
-        fileTarget.MaxArchiveDays = 2;
-
-        //https://github.com/NLog/NLog/wiki/Filtering-log-messages
-        NLog.Config.LoggingRule rule = new NLog.Config.LoggingRule(PWPConstants.Logging.MAIN_LOG_RULE_NAME);
-        rule.FilterDefaultAction = FilterResult.Log;
-        rule.Filters.Add(new WhenMethodFilter((logEventInfo) =>
-        {
-            if (logEventInfo.LoggerName.Equals("Microsoft.EntityFrameworkCore.Database.Command"))
-            {
-                if (logEventInfo.Message.Contains("Creating DbCommand for ") ||
-                    logEventInfo.Message.Contains("Created DbCommand for ") ||
-                    logEventInfo.Message.Contains("Initialized DbCommand for ") ||
-                    logEventInfo.Message.Contains("Closing data reader to '") ||
-                    (logEventInfo.Message.Contains("A data reader for '") && logEventInfo.Message.Contains("is being disposed after spending")))
-                    return FilterResult.Ignore;
-            }
-            else if (logEventInfo.LoggerName.Equals("Microsoft.EntityFrameworkCore.Query"))
-            {
-                if (logEventInfo.Message.Contains("Compiling query expression"))
-                    return FilterResult.Ignore;
-            }
-            else if (logEventInfo.LoggerName.Equals("Microsoft.EntityFrameworkCore.Infrastructure"))
-            {
-                if (logEventInfo.Message.Contains("An 'IServiceProvider' was created for internal use by Entity Framework"))
-                    return FilterResult.Ignore;
-            }
-
-            return FilterResult.Log;
-        }));
-
-        for (int x = (int)_pwpRuntimeValues.LogLevel; x <= 5; x++)
-            rule.EnableLoggingForLevel(NLog.LogLevel.FromOrdinal(x));
-
-        rule.Targets.Add(fileTarget);
-        rule.LoggerNamePattern = "*";
-        LogManager.Configuration.AddRule(rule);
-        LogManager.ReconfigExistingLoggers();
-    }
-
+    #region SwitchNLogInternalLog
     public void SwitchNLogInternalLog(bool on)
     {
         _logger.LogFunctionStartWithArgs().Values(on);
-        _platformPreferences.Set(PWPConstants.PreferenceKeys.LOG_INTERNAL_LOG_ON, on);
+        _platformPreferences.Set(AppConstants.PreferenceKeys.LOG_INTERNAL_LOG_ON, on);
 
         if (on)
         {
-            NLog.Common.InternalLogger.LogFile = _pwpRuntimeValues.NLogInternalLogFullpath;
+            NLog.Common.InternalLogger.LogFile = _runtimeValues.NLogInternalLogFullpath;
             NLog.Common.InternalLogger.LogLevel = NLog.LogLevel.Debug;
         }
         else
@@ -252,4 +249,5 @@ public class PlatformSpecificServices : IPlatformSpecificServices
 
         LogManager.ReconfigExistingLoggers();
     }
+    #endregion
 }
