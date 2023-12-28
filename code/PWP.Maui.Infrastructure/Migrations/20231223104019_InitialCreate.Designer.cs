@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace PWP.Maui.Infrastructure.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(PWPMauiDataContext))]
     [Migration("20231223104019_InitialCreate")]
     partial class InitialCreate
     {

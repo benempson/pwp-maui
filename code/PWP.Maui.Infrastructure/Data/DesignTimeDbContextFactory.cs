@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace PWP.Maui.Infrastructure.Data;
 
-public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<DataContext>
+public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<PWPMauiDataContext>
 {
-    public DataContext CreateDbContext(string[] args)
+    public PWPMauiDataContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
-        optionsBuilder.UseSqlite($"Data Source={new RuntimeValues(Environment.SpecialFolder.LocalApplicationData.ToString()).DbFilename}");
-        return new DataContext(optionsBuilder.Options);
+        var optionsBuilder = new DbContextOptionsBuilder<PWPMauiDataContext>();
+        optionsBuilder.UseSqlite($"Data Source={new PWPRuntimeValues(Environment.SpecialFolder.LocalApplicationData.ToString()).DbFilename}");
+        return new PWPMauiDataContext(optionsBuilder.Options);
     }
 }

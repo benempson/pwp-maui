@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace PWP.Maui.Infrastructure.Data;
 
-public interface IDataContext
+public interface IPWPMauiDataContext
 {
     DbSet<Culture> Cultures { get; }
     DatabaseFacade Database { get; }

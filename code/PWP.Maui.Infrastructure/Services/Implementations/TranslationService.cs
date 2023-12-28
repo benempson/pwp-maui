@@ -13,16 +13,16 @@ public class TranslationService : ITranslationService
 {
     //https://mudblazor.com/features/localization#translation-keys
 
-    private IDataContext? _dataContext = null;
+    private IPWPMauiDataContext? _dataContext = null;
     private List<TranslationArea> _areas = new List<TranslationArea>();
     private bool _cultureIsSupported = true;
     private ILogger<TranslationService> _logger;
     private IPlatformPreferences _platformPreferences;
-    private RuntimeValues _runtimeValues;
+    private PWPRuntimeValues _runtimeValues;
     private List<Translation> _translations = new List<Translation>();
     private List<string> _supportedCultures = new List<string>();
 
-    public TranslationService(IDataContext dataContext, ILogger<TranslationService> logger, IPlatformPreferences platformPreferences, RuntimeValues runtimeValues)
+    public TranslationService(IPWPMauiDataContext dataContext, ILogger<TranslationService> logger, IPlatformPreferences platformPreferences, PWPRuntimeValues runtimeValues)
     {
         _dataContext = dataContext;
         _logger = logger;
@@ -105,7 +105,7 @@ public class TranslationService : ITranslationService
             _translations.Clear();
 
             Culture? culture = null;
-            string currentCulture = _platformPreferences.Get(AppConstants.PreferenceKeys.CULTURE, AppConstants.PreferenceKeys.CULTURE_DEFAULT);
+            string currentCulture = _platformPreferences.Get(PWPConstants.PreferenceKeys.CULTURE, PWPConstants.PreferenceKeys.CULTURE_DEFAULT);
 
             if (!_supportedCultures.Contains(currentCulture))
             {

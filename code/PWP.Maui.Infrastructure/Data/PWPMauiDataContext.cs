@@ -7,9 +7,9 @@ using PWP.Maui.Utils.Extensions;
 
 namespace PWP.Maui.Infrastructure.Data;
 
-public class DataContext : DbContext, IDataContext
+public class PWPMauiDataContext : DbContext, IPWPMauiDataContext
 {
-    private readonly ILogger<DataContext>? _logger;
+    private readonly ILogger<PWPMauiDataContext>? _logger;
     private readonly ILoggerFactory? _loggerFactory;
 
     public DbSet<Culture> Cultures { get { return Set<Culture>(); } }
@@ -18,15 +18,15 @@ public class DataContext : DbContext, IDataContext
     public DbSet<TranslationArea> TranslationAreas { get { return Set<TranslationArea>(); } }
     public DbSet<Translation> Translations { get { return Set<Translation>(); } }
 
-    public DataContext(DbContextOptions<DataContext> options) : base(options)
+    public PWPMauiDataContext(DbContextOptions<PWPMauiDataContext> options) : base(options)
     {
-        _logger = new Logger<DataContext>(new LoggerFactory());
+        _logger = new Logger<PWPMauiDataContext>(new LoggerFactory());
     }
 
-    public DataContext(IServiceProvider serviceProvider, DbContextOptions<DataContext> options) : base(options)
+    public PWPMauiDataContext(IServiceProvider serviceProvider, DbContextOptions<PWPMauiDataContext> options) : base(options)
     {
         _loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-        _logger = _loggerFactory.CreateLogger<DataContext>();
+        _logger = _loggerFactory.CreateLogger<PWPMauiDataContext>();
         _logger.LogFunctionStart();
     }
 

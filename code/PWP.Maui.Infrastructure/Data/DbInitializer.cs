@@ -11,18 +11,18 @@ namespace PWP.Maui.Infrastructure.Data;
 
 public class DbInitializer
 {
-    private readonly DataContext _dataContext;
+    private readonly PWPMauiDataContext _dataContext;
     private readonly ILogger<DbInitializer> _logger;
     private readonly ModelBuilder? _modelBuilder;
 
-    public DbInitializer(ILoggerFactory loggerFactory, DataContext dataContext)
+    public DbInitializer(ILoggerFactory loggerFactory, PWPMauiDataContext dataContext)
     {
         _dataContext = dataContext;
         _logger = loggerFactory.CreateLogger<DbInitializer>();
         _logger.LogFunctionStart();
     }
 
-    public DbInitializer(ModelBuilder modelBuilder, ILoggerFactory loggerFactory, DataContext dataContext)
+    public DbInitializer(ModelBuilder modelBuilder, ILoggerFactory loggerFactory, PWPMauiDataContext dataContext)
     {
         _dataContext = dataContext;
         _logger = loggerFactory.CreateLogger<DbInitializer>();
@@ -56,10 +56,10 @@ public class DbInitializer
         }
 
         string hashCode = configText!.ToSHA1Hash();
-        DataState? ds = _dataContext.DataStates.SingleOrDefault(s => s.Type!.Equals(AppConstants.DataStateTypes.TRANSLATIONS));
+        DataState? ds = _dataContext.DataStates.SingleOrDefault(s => s.Type!.Equals(PWPConstants.DataStateTypes.TRANSLATIONS));
         if (ds == null)
         {
-            ds = new DataState { Type = AppConstants.DataStateTypes.TRANSLATIONS, StateHash = "" };
+            ds = new DataState { Type = PWPConstants.DataStateTypes.TRANSLATIONS, StateHash = "" };
             _dataContext.DataStates.Add(ds);
         }
 

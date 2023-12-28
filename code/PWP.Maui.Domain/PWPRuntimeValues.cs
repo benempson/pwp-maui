@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace PWP.Maui.Domain;
 
-public class RuntimeValues
+public class PWPRuntimeValues
 {
     /// <summary>
     /// The Sqlite Db filename
@@ -52,7 +51,7 @@ public class RuntimeValues
 
     public LogLevel LogLevel { get; set; } = LogLevel.Debug;
 
-    public bool NavOpen { get; set; } = true;
+    public bool NavOpen { get; set; } = false;
 
     /// <summary>
     /// The filename for the NLog internal log file
@@ -69,7 +68,7 @@ public class RuntimeValues
     /// </summary>
     public string NLogInternalLogFullpath { get; private set; }
     
-    public RuntimeValues(string localAppDataFolder)
+    public PWPRuntimeValues(string localAppDataFolder)
     {
         LocalAppDataFolder = localAppDataFolder;
 
